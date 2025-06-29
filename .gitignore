@@ -20,7 +20,7 @@ target/
 *.ipr
 
 ### NetBeans ###
-/nbproject/private/
+/nbproject/private/s
 /nbbuild/
 /dist/
 /nbdist/
@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Grafana ###
+/docker-compose/**/.data/
