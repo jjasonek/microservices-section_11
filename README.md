@@ -44,6 +44,12 @@ http://localhost:8090/actuator
 http://localhost:9000/actuator
 
 
+## Services
+
+### run Redis server
+docker run -p 6379:6379 --name eazyredis -d redis
+
+
 ## Grafana
 
 ### Downloads instead of curl:
@@ -80,3 +86,121 @@ docker compose down
 
 ### Grafana 
 http://localhost:3000
+
+
+## Metrics
+
+### test /actuator/metrics
+
+http://localhost:8080/actuator/metrics:
+{
+    "names": [
+        "application.ready.time",
+        "application.started.time",
+        "disk.free",
+        "disk.total",
+        "executor.active",
+        "executor.completed",
+        "executor.pool.core",
+        "executor.pool.max",
+        "executor.pool.size",
+        "executor.queue.remaining",
+        "executor.queued",
+        "hikaricp.connections",
+        "hikaricp.connections.acquire",
+        "hikaricp.connections.active",
+        "hikaricp.connections.creation",
+        "hikaricp.connections.idle",
+        "hikaricp.connections.max",
+        "hikaricp.connections.min",
+        "hikaricp.connections.pending",
+        "hikaricp.connections.timeout",
+        "hikaricp.connections.usage",
+        "http.client.requests",
+        "http.client.requests.active",
+        "http.server.requests.active",
+        "jdbc.connections.active",
+        "jdbc.connections.idle",
+        "jdbc.connections.max",
+        "jdbc.connections.min",
+        "jvm.buffer.count",
+        "jvm.buffer.memory.used",
+        "jvm.buffer.total.capacity",
+        "jvm.classes.loaded",
+        "jvm.classes.unloaded",
+        "jvm.compilation.time",
+        "jvm.gc.live.data.size",
+        "jvm.gc.max.data.size",
+        "jvm.gc.memory.allocated",
+        "jvm.gc.memory.promoted",
+        "jvm.gc.overhead",
+        "jvm.gc.pause",
+        "jvm.info",
+        "jvm.memory.committed",
+        "jvm.memory.max",
+        "jvm.memory.usage.after.gc",
+        "jvm.memory.used",
+        "jvm.threads.daemon",
+        "jvm.threads.live",
+        "jvm.threads.peak",
+        "jvm.threads.started",
+        "jvm.threads.states",
+        "logback.events",
+        "process.cpu.time",
+        "process.cpu.usage",
+        "process.start.time",
+        "process.uptime",
+        "system.cpu.count",
+        "system.cpu.usage",
+        "tomcat.sessions.active.current",
+        "tomcat.sessions.active.max",
+        "tomcat.sessions.alive.max",
+        "tomcat.sessions.created",
+        "tomcat.sessions.expired",
+        "tomcat.sessions.rejected"
+    ]
+}
+
+Now, we can see the particular metrics by its name from the above list:
+http://localhost:8080/actuator/metrics/process.cpu.usage
+{
+    "name": "process.cpu.usage",
+    "description": "The \"recent cpu usage\" for the Java Virtual Machine process",
+    "measurements": [
+        {
+            "statistic": "VALUE",
+            "value": 0.13436999606134667
+        }
+    ],
+    "availableTags": [
+        {
+            "tag": "application",
+            "values": [
+                "accounts"
+            ]
+        }
+    ]
+}
+
+
+### test /actuator/prometheus
+http://localhost:8080/actuator/prometheus
+# HELP application_ready_time_seconds Time taken for the application to be ready to service requests
+# TYPE application_ready_time_seconds gauge
+application_ready_time_seconds{application="accounts",main_application_class="com.eazybytes.accounts.AccountsApplication"} 13.062
+# HELP application_started_time_seconds Time taken to start the application
+# TYPE application_started_time_seconds gauge
+application_started_time_seconds{application="accounts",main_application_class="com.eazybytes.accounts.AccountsApplication"} 13.054
+# HELP disk_free_bytes Usable space for path
+# TYPE disk_free_bytes gauge
+disk_free_bytes{application="accounts",path="C:\\Training\\Microservices\\section_11\\."} 7.50710870016E11
+# HELP disk_total_bytes Total space for path
+# TYPE disk_total_bytes gauge
+disk_total_bytes{application="accounts",path="C:\\Training\\Microservices\\section_11\\."} 1.02301411328E12
+...
+
+http://localhost:8090/actuator/prometheus
+http://localhost:9000/actuator/prometheus
+http://localhost:8070/actuator/prometheus
+http://localhost:8071/actuator/prometheus
+http://localhost:8072/actuator/prometheus

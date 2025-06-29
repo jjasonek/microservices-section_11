@@ -34,6 +34,9 @@ management:
   info:
     env:
       enabled: true
+  metrics:  # group the metrics under application name accounts
+    tags:
+      application: ${spring.application.name}
 
 info:   # info for Eureka Dashboard, which is exposed as actuator endpoint, which we are allowing by management.info.env.enabled
   app:

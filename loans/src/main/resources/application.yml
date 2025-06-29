@@ -40,6 +40,9 @@ management:   # to see in browser http://localhost:8090/actuator
   info:
     env:
       enabled: true
+  metrics: # group the metrics under application name accounts
+    tags:
+      application: ${spring.application.name}
 
 eureka:
   instance:

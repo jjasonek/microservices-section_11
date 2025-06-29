@@ -44,6 +44,9 @@ management:   # to see in browser http://localhost:8080/actuator
   info:
     env:
       enabled: true
+  metrics: # group the metrics under application name accounts
+    tags:
+      application: ${spring.application.name}
 
 # this allows the app to be shutdown remotely by hitting http://localhost:8080/actuator/shutdown
 # This setting is no more needed.
