@@ -110,8 +110,9 @@ public class LoansController {
             String mobileNumber
     ) {
 
-        logger.debug("eazybank-correlation-id found: {}", correlationId);
+        logger.debug("fetchLoanDetails method start");
         LoansDto loansDto = iLoansService.fetchLoan(mobileNumber);
+        logger.debug("fetchLoanDetails method end");
         return ResponseEntity.status(HttpStatus.OK).body(loansDto);
     }
 

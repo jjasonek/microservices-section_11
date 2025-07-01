@@ -111,8 +111,9 @@ public class CardsController {
             String mobileNumber
     ) {
 
-        logger.debug("eazybank-correlation-id found: {}", correlationId);
+        logger.debug("fetchCardDetails method start");
         CardsDto cardsDto = iCardsService.fetchCard(mobileNumber);
+        logger.debug("fetchCardDetails method end");
         return ResponseEntity.status(HttpStatus.OK).body(cardsDto);
     }
 
