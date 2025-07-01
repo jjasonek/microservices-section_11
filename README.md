@@ -250,3 +250,8 @@ docker image push docker.io/jjasonek/cards:s11
 docker image push docker.io/jjasonek/configserver:s11
 docker image push docker.io/jjasonek/eurekaserver:s11
 docker image push docker.io/jjasonek/gatewayserver:s11
+
+
+### Note
+I should have added the Tempo settings in the datasource.yaml file. But I already did it during the Prometheus setup.
+This is why I saw the Tempo between connections during Prometheus testing.
