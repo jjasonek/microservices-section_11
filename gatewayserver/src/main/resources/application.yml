@@ -34,7 +34,7 @@ management:
   info:
     env:
       enabled: true
-  metrics:  # group the metrics under application name accounts
+  metrics:  # group the metrics under application name gatewayserver
     tags:
       application: ${spring.application.name}
 

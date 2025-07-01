@@ -18,6 +18,6 @@ management:
     health:
       probes:
         enabled: true
-  metrics: # group the metrics under application name accounts
+  metrics: # group the metrics under application name eurekaserver
     tags:
       application: ${spring.application.name}

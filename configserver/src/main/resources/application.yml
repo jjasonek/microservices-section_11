@@ -35,7 +35,7 @@ management:   # to see in browser http://localhost:8071/actuator
     health:
       probes:
         enabled: true
-  metrics: # group the metrics under application name accounts
+  metrics: # group the metrics under application name configserver
     tags:
       application: ${spring.application.name}
 
