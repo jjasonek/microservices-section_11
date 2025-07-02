@@ -255,3 +255,22 @@ docker image push docker.io/jjasonek/gatewayserver:s11
 ### Note
 I should have added the Tempo settings in the datasource.yaml file. But I already did it during the Prometheus setup.
 This is why I saw the Tempo between connections during Prometheus testing.
+
+
+### Logs examples
+#### uploading the OTEL java agent class
+Picked up JAVA_TOOL_OPTIONS: -javaagent:/app/libs/opentelemetry-javaagent-2.17.0.jar
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[otel.javaagent 2025-07-01 21:53:52:655 +0000] [main] INFO io.opentelemetry.javaagent.tooling.VersionLogger - opentelemetry-javaagent - version: 2.17.0
+
+#### Here, in square brackets we have the tags, trace ID and the span ID values.
+2025-07-01T22:09:25.900Z  INFO [accounts,,] 1 --- [accounts] [rap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2025-07-01T22:14:25.883Z  INFO [accounts,,] 1 --- [accounts] [rap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+Hibernate: select c1_0.customer_id,c1_0.created_at,c1_0.created_by,c1_0.email,c1_0.mobile_number,c1_0.name,c1_0.updated_at,c1_0.updated_by from customer c1_0 where c1_0.mobile_number=?
+Hibernate: insert into customer (created_at,created_by,email,mobile_number,name,customer_id) values (?,?,?,?,?,default)
+Hibernate: select a1_0.account_number,a1_0.account_type,a1_0.branch_address,a1_0.created_at,a1_0.created_by,a1_0.customer_id,a1_0.updated_at,a1_0.updated_by from accounts a1_0 where a1_0.account_number=?
+Hibernate: insert into accounts (account_type,branch_address,created_at,created_by,customer_id,account_number) values (?,?,?,?,?,?)
+2025-07-01T22:17:48.231Z DEBUG [accounts,cd35fc0d87b50a6c6c3ade2c26a59a10,25648573d2842566] 1 --- [accounts] [io-8080-exec-10] c.e.a.controller.CustomerController      : fetchCustomerDetails method start
+Hibernate: select c1_0.customer_id,c1_0.created_at,c1_0.created_by,c1_0.email,c1_0.mobile_number,c1_0.name,c1_0.updated_at,c1_0.updated_by from customer c1_0 where c1_0.mobile_number=?
+Hibernate: select a1_0.account_number,a1_0.account_type,a1_0.branch_address,a1_0.created_at,a1_0.created_by,a1_0.customer_id,a1_0.updated_at,a1_0.updated_by from accounts a1_0 where a1_0.customer_id=?
+2025-07-01T22:17:48.890Z DEBUG [accounts,cd35fc0d87b50a6c6c3ade2c26a59a10,25648573d2842566] 1 --- [accounts] [io-8080-exec-10] c.e.a.controller.CustomerController      : fetchCustomerDetails method end
