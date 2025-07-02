@@ -1,7 +1,7 @@
 services:
 
   read:
-    image: grafana/loki:latest
+    image: grafana/loki:3.5
     command: "-config.file=/etc/loki/config.yaml -target=read"
     ports:
       - 3101:3100
@@ -22,7 +22,7 @@ services:
           - loki    # We keep this alias because Grafana might use it internally.
 
   write:
-    image: grafana/loki:latest
+    image: grafana/loki:3.5
     command: "-config.file=/etc/loki/config.yaml -target=write"
     ports:
       - 3102:3100
@@ -41,7 +41,7 @@ services:
       <<: *loki-dns
 
   alloy:
-    image: grafana/alloy:latest
+    image: grafana/alloy:v1.9.2
     volumes:
       - ../observability/alloy/alloy-local-config.yaml:/etc/alloy/config.alloy:ro
       - /var/run/docker.sock:/var/run/docker.sock
@@ -55,7 +55,7 @@ services:
       service: network-deploy-service
 
   minio:
-    image: minio/minio
+    image: minio/minio:RELEASE.2025-06-13T11-33-47Z
     entrypoint:
       - sh
       - -euc
@@ -81,8 +81,32 @@ services:
       file: common-config.yml
       service: network-deploy-service
 
+  prometheus:
+    image: prom/prometheus:v2.53.5
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../observability/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+
+  tempo:
+    image: grafana/tempo:2.8.1
+    container_name: tempo
+    command: -config.file /etc/tempo-config.yml
+    ports:
+      - "3110:3100"
+      - "4318:4318"
+    volumes:
+      - ../observability/tempo/tempo.yml:/etc/tempo-config.yml
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:12.0.2
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
       - GF_AUTH_ANONYMOUS_ENABLED=true
@@ -93,22 +117,12 @@ services:
       - sh
       - -euc
       - |
-        mkdir -p /etc/grafana/provisioning/datasources
-        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
-        apiVersion: 1
-        datasources:
-          - name: Loki
-            type: loki
-            access: proxy
-            url: http://gateway:3100
-            jsonData:
-              httpHeaderName1: "X-Scope-OrgID"
-            secureJsonData:
-              httpHeaderValue1: "tenant1"
-        EOF
         /run.sh
     ports:
       - "3000:3000"
+    volumes:
+      - ../observability/grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+      - ../../../docker_data/grafana:/var/lib/grafana
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1" ]
       interval: 10s
@@ -119,7 +133,7 @@ services:
       service: network-deploy-service
 
   backend:
-    image: grafana/loki:latest
+    image: grafana/loki:3.5
     volumes:
       - ../observability/loki/loki-config.yaml:/etc/loki/config.yaml
     ports:
@@ -133,7 +147,7 @@ services:
       service: network-deploy-service
 
   gateway:
-    image: nginx:latest
+    image: nginx:1.28.0
     depends_on:
       - read
       - write
@@ -203,7 +217,7 @@ services:
       service: network-deploy-service
 
   redis:
-    image: redis
+    image: redis:7.2.4
     ports:
       - "6379:6379"
     healthcheck:
@@ -228,6 +242,8 @@ services:
     extends:
       file: common-config.yml
       service: microservice-base-config
+    environment:
+      OTEL_SERVICE_NAME: "configserver"
 
   eurekaserver:
     image: "jjasonek/eurekaserver:s11"
@@ -236,6 +252,7 @@ services:
       - "8070:8070"
     environment:
       SPRING_APPLICATION_NAME: "eurekaserver"   # This is here because of bug in Spring Cloud Config Server version.
+      OTEL_SERVICE_NAME: "eurekaserver"
     healthcheck:
       test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
       interval: 10s
@@ -253,6 +270,7 @@ services:
       - "8080:8080"
     environment:
       SPRING_APPLICATION_NAME: "accounts"   # This is here because of bug in Spring Cloud Config Server version.
+      OTEL_SERVICE_NAME: "accounts"
     healthcheck:
       test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
       interval: 10s
@@ -270,6 +288,7 @@ services:
       - "8090:8090"
     environment:
       SPRING_APPLICATION_NAME: "loans"   # This is here because of bug in Spring Cloud Config Server version.
+      OTEL_SERVICE_NAME: "loans"
     healthcheck:
       test: "curl --fail --silent localhost:8090/actuator/health/readiness | grep UP || exit 1"
       interval: 10s
@@ -287,6 +306,7 @@ services:
       - "9000:9000"
     environment:
       SPRING_APPLICATION_NAME: "cards"   # This is here because of bug in Spring Cloud Config Server version.
+      OTEL_SERVICE_NAME: "cards"
     healthcheck:
       test: "curl --fail --silent localhost:9000/actuator/health/readiness | grep UP || exit 1"
       interval: 10s
@@ -317,6 +337,7 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_DATA_REDIS_TIMEOUT: 1s
+      OTEL_SERVICE_NAME: "gatewayserver"
     extends:
       file: common-config.yml
       service: microservice-eureka-config

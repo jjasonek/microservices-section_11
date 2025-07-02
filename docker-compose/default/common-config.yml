@@ -11,6 +11,11 @@ services:
       resources:
         limits:
           memory: 700m
+    environment:
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/libs/opentelemetry-javaagent-2.17.0.jar"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://tempo:4318"  # port may be 4318
+      OTEL_METRICS_EXPORTER: none   # We don't want OTEL to export metrics, we have Prometheus
+      OTEL_LOGS_EXPORTER: none    # may be needed in newer versions
 
   microservice-configserver-config:
     extends:
